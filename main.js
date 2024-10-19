@@ -1,5 +1,7 @@
 const {program} = require('commander');
 const http = require('http');
+const fs = require ('fs').promises
+const path = require('path');
 
 program
     .requiredOption('-h, --host <host>', 'Server host')
@@ -10,9 +12,22 @@ program.parse(process.argv);
 
 const {host, port, cache} = program.opts();
 
-const server = http.createServer((req, res) => {
-    res.end('Server is running');
-});
+const server = http.createServer(async (req, res) => {
+    const code = req.url.slice(1);
+    const filePath = path.join(cache, `${code}.jpg`);
+
+    if (req.method === 'GET') {
+        try {
+            const data = await fs.readFile(filePath);
+            res.writeHead(200, {'Content-Type': 'image/jpeg'});
+            res.end(data);
+        } 
+        catch (err) {
+            res.writeHead(404);
+            res.end('Not Found');
+        }
+}});
+
   
 server.listen(port, host, () => {
     console.log(`Server running at http://${host}:${port}/`);
