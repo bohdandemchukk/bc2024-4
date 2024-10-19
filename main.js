@@ -26,7 +26,37 @@ const server = http.createServer(async (req, res) => {
             res.writeHead(404);
             res.end('Not Found');
         }
-}});
+    } 
+    else if (req.method === 'PUT') {
+        let test = [];
+        req.on('data', chunk => {
+            test.push(chunk);})
+            
+        req.on('end', async () => {
+            test = Buffer.concat(test);
+            try {
+                await fs.writeFile(filePath, test);
+                res.writeHead(201);
+                res.end('Created');
+            } catch (err) {
+                res.writeHead(404);
+                res.end('Not Found');
+            }
+        });
+    } else if (req.method === 'DELETE') {
+        try {
+            await fs.unlink(filePath);
+            res.writeHead(200);
+            res.end('OK');
+        } catch (err) {
+            res.writeHead(404);
+            res.end('Not Found');
+        }
+    } else {
+        res.writeHead(405);
+        res.end('Method Not Allowed');
+    }
+});
 
   
 server.listen(port, host, () => {
