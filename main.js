@@ -2,9 +2,9 @@ const {program} = require('commander');
 const http = require('http');
 
 program
-    .requiredOption("-h, --host <host>", "Server host")
-    .requiredOption("-p, --port <port>", "Server port")
-    .requiredOption("-c, --cache <cache>", "cache directory")
+    .requiredOption('-h, --host <host>', 'Server host')
+    .requiredOption('-p, --port <port>', 'Server port')
+    .requiredOption('-c, --cache <cache>', 'cache directory')
     
 program.parse(process.argv);
 
