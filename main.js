@@ -2,6 +2,7 @@ const {program} = require('commander');
 const http = require('http');
 const fs = require ('fs').promises
 const path = require('path');
+const superagent = require('superagent')
 
 program
     .requiredOption('-h, --host <host>', 'Server host')
@@ -23,15 +24,21 @@ const server = http.createServer(async (req, res) => {
             res.end(data);
         } 
         catch (err) {
-            res.writeHead(404);
-            res.end('Not Found');
+            try {
+                const response = await superagent.get(`https://http.cat/${code}`);
+                await fs.writeFile(filePath, response.body);
+                res.writeHead(200, { 'Content-Type': 'image/jpeg' });
+                res.end(response.body);}
+            catch (error) {
+                res.writeHead(404);
+                res.end('Not Found');}
         }
-    } 
+    }
     else if (req.method === 'PUT') {
         let test = [];
         req.on('data', chunk => {
             test.push(chunk);})
-            
+
         req.on('end', async () => {
             test = Buffer.concat(test);
             try {
